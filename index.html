@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Sistem Monitoring Infus Pasien Terpusat</title>
+    <script type="text/javascript" src="socket.io.js"></script>
+    <script type="text/javascript" src="jquery-3.2.0.min.js"></script>
+    <script src="https://code.highcharts.com/highcharts.src.js"></script>
+    <script type="text/javascript" src="http://static.fusioncharts.com/code/latest/fusioncharts.js"></script>
+    <script type="text/javascript" src="http://static.fusioncharts.com/code/latest/themes/fusioncharts.theme.fint.js?cacheBust=56"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="container">
+        <h2 id='tes' class="text-center">Sistem Monitoring Infus Pasien Terpusat</h2>
+        <div class="panel panel-primary" style="border-radius: 0px;">
+            <div class="panel-heading text-center" style="border-radius: 0px;"><strong>Data dari Node</strong></div>
+            <div class="panel-body">
+                <table class="table table-bordered">
+                    <thead class="bg-primary">
+                        <tr class="text-center">
+                            <td><strong>Node</strong></td>
+                            <td><strong>Topik</strong></td>
+                            <td><strong>Nilai (tetes)</strong></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="text-center">
+                            <td>Node 1</td>
+                            <td id="headsatu"></td>
+                            <td id="datasatu"></td>
+                        </tr>
+                        <tr class="text-center">
+                            <td>Node 2</td>
+                            <td id="headdua"></td>
+                            <td id="datadua"></td>
+                        </tr>
+                        <tr class="text-center">
+                            <td>Node 3</td>
+                            <td id="headtiga"></td>
+                            <td id="datatiga"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="panel panel-primary" style="border-radius: 0px;">
+            <div class="panel-heading text-center" style="border-radius: 0px;"><strong>Data Infus Pada Ruangan</strong></div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div id="chart-container">Smart Infus Chart</div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div id="chart-container-dua">Smart Infus Chart</div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div id="chart-container-tiga">Smart Infus Chart</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+    var node_a = 100;
+    var node_b = 100;
+    var node_c = 100;
+    var fusioncharts = new FusionCharts({
+        type: 'cylinder',
+        dataFormat: 'json',
+        id: 'fuelMeter-1',
+        renderAt: 'chart-container',
+        width: '250',
+        height: '350',
+        dataSource: {
+            "chart": {
+                "theme": "fint",
+                "caption": "Kamar 1",
+                "subcaption": "Ketersediaan Infus:",
+                "lowerLimit": "0",
+                "upperLimit": "100",
+                "lowerLimitDisplay": "Kosong",
+                "upperLimitDisplay": "Penuh",
+                "numberSuffix": " %",
+                "showValue": "1",
+                "chartBottomMargin": "25",
+                "cyloriginx": "80",
+                //Customizing the origin y position
+                "cyloriginy": "260",
+                //Setting the radius of the Cylinder
+                "cylradius": "60",
+                //Setting the height of the Cylinder
+                "cylheight": "180"
+            },
+            "value": "100"
+        },
+        "events": {
+            "rendered": function(evtObj, argObj) {
+                var fuelVolume = 100,
+                    gaugeRef = evtObj.sender;
+                // if (fuelVolume == bs) {
+                //     gaugeRef.feedData("&value=" + String(fuelVolume));
+                // } else {
+
+                //     var consVolume = fuelVolume - bs;
+                //     gaugeRef.feedData("&value=" + String(consVolume));
+                // }
+                gaugeRef.chartInterval = setInterval(function() {
+                    (fuelVolume < 10) ? (fuelVolume = 100) : "";
+                    var consVolume = fuelVolume - node_a;
+                    console.log(consVolume);
+                    if (consVolume == 90) {
+                        alert('Infus Pada Node 1 Hampir Habis!');
+                    }
+                    gaugeRef.feedData("&value=" + consVolume);
+                }, 3000);
+            },
+            "disposed": function(evt, arg) {
+                clearInterval(evt.sender.chartInterval);
+            }
+        }
+    });
+    fusioncharts.render();
+
+    var fusioncharts = new FusionCharts({
+        type: 'cylinder',
+        dataFormat: 'json',
+        id: 'fuelMeter-2',
+        renderAt: 'chart-container-dua',
+        width: '250',
+        height: '350',
+        dataSource: {
+            "chart": {
+                "theme": "fint",
+                "caption": "Kamar 2",
+                "subcaption": "Ketersediaan Infus:",
+                "lowerLimit": "0",
+                "upperLimit": "100",
+                "lowerLimitDisplay": "Kosong",
+                "upperLimitDisplay": "Penuh",
+                "numberSuffix": " %",
+                "showValue": "1",
+                "chartBottomMargin": "25",
+                "cyloriginx": "80",
+                //Customizing the origin y position
+                "cyloriginy": "260",
+                //Setting the radius of the Cylinder
+                "cylradius": "60",
+                //Setting the height of the Cylinder
+                "cylheight": "180"
+            },
+            "value": "100"
+        },
+        "events": {
+            "rendered": function(evtObj, argObj) {
+                var fuelVolume = 100,
+                    gaugeRef = evtObj.sender;
+                gaugeRef.chartInterval = setInterval(function() {
+                    (fuelVolume < 10) ? (fuelVolume = 100) : "";
+                    var consVolume = fuelVolume - node_b;
+                    console.log(consVolume);
+                    if (consVolume == 90) {
+                        alert('Infus Pada Node 1 Hampir Habis!');
+                    }
+                    gaugeRef.feedData("&value=" + consVolume);
+                }, 3000);
+            },
+            "disposed": function(evt, arg) {
+                clearInterval(evt.sender.chartInterval);
+            }
+        }
+    });
+    fusioncharts.render();
+
+    var fusioncharts = new FusionCharts({
+        type: 'cylinder',
+        dataFormat: 'json',
+        id: 'fuelMeter-3',
+        renderAt: 'chart-container-tiga',
+        width: '250',
+        height: '350',
+        dataSource: {
+            "chart": {
+                "theme": "fint",
+                "caption": "Kamar 3",
+                "subcaption": "Ketersediaan Infus:",
+                "lowerLimit": "0",
+                "upperLimit": "100",
+                "lowerLimitDisplay": "Kosong",
+                "upperLimitDisplay": "Penuh",
+                "numberSuffix": " %",
+                "showValue": "1",
+                "chartBottomMargin": "25",
+                "cyloriginx": "80",
+                //Customizing the origin y position
+                "cyloriginy": "260",
+                //Setting the radius of the Cylinder
+                "cylradius": "60",
+                //Setting the height of the Cylinder
+                "cylheight": "180"
+            },
+            "value": "100"
+        },
+        "events": {
+            "rendered": function(evtObj, argObj) {
+                var fuelVolume = 100,
+                    gaugeRef = evtObj.sender;
+                gaugeRef.chartInterval = setInterval(function() {
+                    (fuelVolume < 10) ? (fuelVolume = 100) : "";
+                    var consVolume = fuelVolume - node_c;
+                    console.log(consVolume);
+                    if (consVolume == 90) {
+                        alert('Infus Pada Node 1 Hampir Habis!');
+                    }
+                    gaugeRef.feedData("&value=" + consVolume);
+                }, 3000);
+            },
+            "disposed": function(evt, arg) {
+                clearInterval(evt.sender.chartInterval);
+            }
+        }
+    });
+    fusioncharts.render();
+
+    var socket = io.connect('http://localhost:5000');
+    socket.on('connect', function() {
+      console.log('mengerjakan socket on');
+        socket.on('mqtt', function(msg) {
+            var elmarr = msg.topic.split("/");
+            var elm = elmarr[3];
+            if (msg.topic == 'nodesatu') {
+                document.getElementById("datasatu").innerHTML = msg.payload;
+                document.getElementById("headsatu").innerHTML = msg.topic;
+                // tikna(msg.payload);
+                node_a = msg.payload;
+            }
+            else if (msg.topic == 'nodedua') {
+                document.getElementById("datadua").innerHTML = msg.payload;
+                document.getElementById("headdua").innerHTML = msg.topic;
+                // tikna(msg.payload);
+                node_b = msg.payload;
+            }
+
+            else if (msg.topic == 'nodetiga') {
+                document.getElementById("datatiga").innerHTML = msg.payload;
+                document.getElementById("headtiga").innerHTML = msg.topic;
+                // tikna(msg.payload);
+                node_c = msg.payload;
+            }
+            
+            console.log(msg.topic + ' ' + msg.payload);
+            $('#'.concat(elm)).html(msg.payload);
+        });
+        socket.emit('subscribe', {
+            topic: 'nodesatu'
+        });
+        socket.emit('subscribe', {
+            topic: 'nodedua'
+        });
+        // socket.emit('subscribe', {
+        //     topic: 'nodetiga'
+        // });
+    });
+    </script>
+</body>
+
+</html>
